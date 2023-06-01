@@ -1,0 +1,177 @@
+
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+	<script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.1/dist/mindar-image-aframe.prod.js"></script>
+	<script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.min.js"></script>
+	
+<!-- <style>
+
+.dancebutton {
+  display: inline-block;
+  padding: 15px 25px;
+  font-size: 24px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  outline: none;
+  color: #fff;
+  background-color: #4CAF50;
+  border: 0.2em solid white;
+  position:absolute;
+
+  bottom: 6vh;
+  border-radius: 100px;
+}
+
+
+.dancebutton:hover {background-color: #008CBA}
+
+.dancebutton:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
+/* .button2 {background-color: #008CBA;} Blue */
+</style> -->
+
+
+
+
+</head>
+  <body>
+	<!-- <button id = "danceclick" class="dancebutton">dance</button> -->
+
+
+
+    <a-scene mindar-image="imageTargetSrc: assets/cards.mind ;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+      <a-assets>
+		<img id ="redbutton" src="assets/red.png" > 
+		<img id = "idlebutton" src="assets/idle.png">
+		<img id = "danceimg"  src ="assets/dance.png" > 
+		<img id = "walkimg"  src ="assets/walk.png" > 
+	
+
+        <!-- <a-asset-item id="avatarModel" src="assets/scene.gltf "></a-asset-item> -->
+		<a-asset-item id ="dancemodel" src = "assets/avatar.glb" ></a-asset-item>
+      </a-assets>
+	  
+
+
+
+	  <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;" raycaster="far: ${customFields.libVersion}; objects: .clickable"></a-camera>
+		
+	 	 <a-entity light="type: ambient; intensity: 0.5;"></a-entity>
+  		
+		 <a-entity light="type: directional;
+                   castShadow: true;
+                   intensity: 1;
+				   shadowMapHeight: 512;
+				   shadowMapWidth: 512
+                   shadowCameraVisible: true;
+				   target: dance"
+				   position="0 2 1.5"></a-entity>
+
+     	 <a-entity id= "trigger" mindar-image-target="targetIndex: 0">
+		
+        <a-plane id = "stop"  src ="#redbutton" class="clickable" transparent = "true" position="-.4 -.4 0" height="0.15" width=".2" rotation="0 0 0"  ></a-plane> 
+
+		<a-plane id = "idlePlane"  src ="#idlebutton" class="clickable"  transparent = "true" position="-.2 -.4 0" height="0.15" width=".2" rotation="0 0 0"  ></a-plane> 
+		<a-plane id = "dancePlane" src= "#danceimg" class="clickable"  transparent = "true"  position="0 -.4 0" height="0.15" width=".2" rotation="0 0 0"  ></a-plane> 
+		<a-plane id = "walkPlane" src= "#walkimg" class="clickable"  transparent = "true"  position=".2 -.4 0" height="0.15" width=".2" rotation="0 0 0"  ></a-plane> 
+		     
+		 <!-- <a-gltf-model id="truck" rotation="0 90 0 " position=".8 0 0" scale="0.4 0.4 0.4" src="#avatarModel" animation="property: position; to: -1 0 0; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate; enabled:true"> -->
+		<a-entity id = "dance" 
+					gltf-model = "#dancemodel" 
+					position="0 -.2 0" 
+					scale=".5 .5 .5" 
+					animation-mixer="clip: pose" 
+					shadow="receive: true">
+		></a-entity>>	
+
+		<!-- <a-gltf-model id="truck" rotation="0 90 0 " position="0 -.2 0" scale="0.4 0.4 0.4" src="#avatarModel" animation-mixer  ></a-gltf-model> -->
+		
+		</a-entity>
+
+
+    </a-scene>
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+		const sceneEl = document.querySelector('a-scene');
+		const arSystem = sceneEl.systems["mindar-image-system"];
+
+		const stopButton = document.querySelector("#stop");
+
+		const cardTrigger = document.querySelector('#trigger');
+		const idleAvatar = document.querySelector("#idlePlane");
+	//	const colorChange = document.querySelector('#ColorButton');
+		const dancingavatar = document.querySelector('#dancePlane');
+		const danceravatar = document.querySelector('#dance');
+
+		const walkavatar = document.querySelector('#walkPlane');
+		
+	
+
+
+		dancingavatar.addEventListener("click", event => {
+			 danceravatar.setAttribute("animation-mixer","clip: dance1");
+	  		console.log("dance");
+		});
+
+		walkavatar.addEventListener("click", event => {
+			 danceravatar.setAttribute("animation-mixer","clip: walk");
+	  		console.log("walk");
+		});
+		
+		
+
+		stopButton.addEventListener('click', () => {
+			arSystem.stop();
+			console.log("stop");
+		});
+
+		idleAvatar.addEventListener("click", (event) => {
+			danceravatar.setAttribute("animation-mixer","clip: idle");
+		
+			console.log("blue");
+		});
+
+
+
+
+		cardTrigger.addEventListener("targetFound" , (e) => {
+			console.log("target found");
+			isMarkerVisible = true;
+
+		});
+		cardTrigger.addEventListener("targetLost" , (e)  => {
+			console.log("target lost");
+			
+
+		});
+
+
+
+
+		
+ 		// handleRotation(event) {
+   		//  if (isMarkerVisible) {
+      	// 	el.object3D.rotation.y +=
+       	// 	 event.detail.positionChange.x * rotationFactor;
+
+     	// 	 el.object3D.rotation.x +=
+      	//   event.detail.positionChange.y * rotationFactor;
+    	// 	}
+ 	    // }
+
+
+
+
+  });
+	</script>
+
+
+  </body>
+  </html>
